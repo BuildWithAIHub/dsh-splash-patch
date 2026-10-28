@@ -88,6 +88,25 @@ The splash page plays a local file from the DSH resources directory:
 `boot-intro-awakening.mp4`. **No video or DSH asset is redistributed by this repo** -
 the files must already exist in your installation.
 
+## Startup video rotation (optional)
+
+By default the splash uses the clip saved in the animation plugin's selection file.
+To rotate between several clips across launches, put an array of resource file names in
+`resources\splash-rotation.json` (next to `app.asar`):
+
+```json
+["boot-intro-cyberpunk.mp4", "boot-intro-awakening.mp4"]
+```
+
+Each launch plays the next entry and writes the counter to
+`resources\splash-rotation.state`, so launch 1 plays the first clip, launch 2 the second,
+then it wraps around.
+
+A rotation file can also live in `%DSH_HOME%\boot-animation\splash-rotation.json`; the
+resources copy is checked first. To keep the rotation working after a DSH update, place
+the same file next to the patcher (`patcher\splash-rotation.json`) — the patcher installs
+it every time it re-patches the archive.
+
 ## Test the patcher without touching DSH
 
 ```powershell
