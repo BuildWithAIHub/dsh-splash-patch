@@ -7,6 +7,16 @@ while DSH boots behind it - and keep it working after DSH auto-updates.
 再进 DSH"的开屏效果；DSH 更新会替换 `app.asar`，本工具用"自动补丁器 + 看门狗 + 启动器"
 在更新后自动把补丁补回来。
 
+![Splash illustration](docs/images/splash.png)
+
+*示意图：开屏播放时整个屏幕都是视频，DSH 在后台加载。图片由 `docs/images/generate.py`
+用代码绘制，不是截图，也不含任何真实画面或隐私数据。*
+
+![Startup flow](docs/images/flow.png)
+
+*示意图：快捷方式 → 启动器（必要时先补丁）→ 开屏窗口播放视频，同时隐藏的主窗口加载
+DSH → 视频播完 / 按 Esc 后无缝进入工作区。*
+
 ## Requirements
 
 - Windows 10/11
@@ -43,12 +53,20 @@ Nothing is added to the DSH profile or your data folder.
 
 ## What it does at start-up
 
+## What it does at start-up
+
+![Animated illustration](docs/images/splash.gif)
+
 1. The launcher silently re-applies the patch if a DSH update replaced `app.asar`
    (only when DSH is not running).
 2. The patched DSH creates a frameless fullscreen **splash window** that plays a local video,
    while the hidden main window loads the real application in parallel.
 3. When the clip ends (or the user presses Esc / clicks), the splash closes and the
    already-loaded workspace is shown. Safety timers guarantee it can never hang.
+
+All images in this repository are generated from scratch by
+`docs/images/generate.py`. They are illustrations, not screenshots, and contain no
+personal data, chat content, or DSH assets.
 
 ## After a DSH auto-update
 
