@@ -1,0 +1,15 @@
+# local configuration and runtime state
+config.json
+state/
+test/app.asar.pristine
+test/*.asar
+
+# backups and logs
+*.bak
+*.log
+
+# dependencies / editors
+node_modules/
+.vscode/
+.DS_Store
+Thumbs.db
