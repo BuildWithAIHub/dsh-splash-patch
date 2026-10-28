@@ -57,7 +57,7 @@ DSH → 视频播完 / 按 Esc 后无缝进入工作区。*
 |---|---|
 | `<DSH install>\resources\app.asar` | Adds a fullscreen splash window + IPC. The pristine archive is backed up to `state\app.asar.unpatched.bak` before the first write. |
 | Existing DSH shortcuts | Pointed at `launch\launch-dsh.vbs`. Originals are backed up as `*.lnk.dsh-patch-backup`. |
-| Task Scheduler | Per-user task `DSH-SplashPatch-Watchdog` (at logon + every 5 minutes). |
+| Task Scheduler | Per-user task `DSH-SplashPatch-Watchdog` (at logon + every 5 minutes). Launched through a `wscript.exe` shim (`watchdog\run-watchdog.vbs`), so it never flashes a console window. |
 
 Nothing is added to the DSH profile or your data folder.
 
