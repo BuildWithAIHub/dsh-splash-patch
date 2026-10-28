@@ -242,52 +242,14 @@ const finishBootSplash = () => {
 };
 `
 
-const SPLASH_VIDEO_HELPER = `\treturn new Response(request.method === "HEAD" ? null : content, { headers: { "content-type": MIME[extname(target)] ?? "application/octet-stream" } });
+const SPLASH_VIDEO_HELPER = `	return new Response(request.method === "HEAD" ? null : content, { headers: { "content-type": MIME[extname(target)] ?? "application/octet-stream" } });
 }
-/**
- * PATCHED: pick the boot splash clip for this launch.
- *
- * A rotation file is an array of resource file names; launches walk it in order
- * (the counter lives in \`splash-rotation.state\` next to the file). The file is
- * looked up beside the video resources first, then under
- * \`%DSH_HOME%/boot-animation/\`. Without one, the animation plugin's saved
- * selection decides.
- */
+/** PATCHED: pick the boot splash clip from the animation plugin's saved selection. */
 async function bootSplashVideoFile() {
 	const clips = { "builtin:brand": "brand", "builtin:cyberpunk": "cyberpunk", "builtin:awakening": "awakening", "builtin:startup": "startup" };
-	const rotationFiles = [join(process.resourcesPath, "splash-rotation.json")];
 	try {
 		const home = process.env.DSH_HOME ?? join(app.getPath("home"), ".dsh");
-		rotationFiles.push(join(home, "boot-animation", "splash-rotation.json"));
-	} catch {
-		/* no home path: only the resources file is checked */
-	}
-	for (const rotationFile of rotationFiles) {
-		try {
-			const rotation = JSON.parse(await readFile(rotationFile, "utf8"));
-			const names = Array.isArray(rotation) ? rotation.filter((name) => typeof name === "string" && /^[A-Za-z0-9._-]+[.]mp4$/.test(name)) : [];
-			if (names.length === 0) continue;
-			const stateFile = join(dirname(rotationFile), "splash-rotation.state");
-			let index = 0;
-			try {
-				index = Math.abs(Math.trunc(Number(await readFile(stateFile, "utf8")) || 0));
-			} catch {
-				index = 0;
-			}
-			const chosen = names[index % names.length];
-			try {
-				await writeFile(stateFile, String((index + 1) % names.length), "utf8");
-			} catch {
-				/* without the counter the next launch starts over; the clip still plays */
-			}
-			return join(process.resourcesPath, chosen);
-		} catch {
-			/* try the next rotation file */
-		}
-	}
-	try {
-		const base = process.env.DSH_HOME ?? join(app.getPath("home"), ".dsh");
-		const raw = await readFile(join(base, "boot-animation", "selection.json"), "utf8");
+		const raw = await readFile(join(home, "boot-animation", "selection.json"), "utf8");
 		const parsed = JSON.parse(raw) ?? {};
 		const id = parsed.splashClipId ?? parsed.selectedClipId;
 		const name = clips[id];
@@ -609,24 +571,6 @@ function patchArchive({ asarPath, outPath, quiet }) {
   }
 }
 
-const ROTATION_SOURCE = path.join(HERE, 'splash-rotation.json')
-
-/**
- * Install the rotation preference next to the archive, if this patcher ships one.
- * Kept next to the archive (resources\) so the desktop process finds it without
- * knowing DSH_HOME; the patcher re-installs it after every DSH update.
- */
-function installRotationFile(asarPath, say) {
-  if (!fs.existsSync(ROTATION_SOURCE)) return
-  const target = path.join(path.dirname(asarPath), 'splash-rotation.json')
-  try {
-    fs.copyFileSync(ROTATION_SOURCE, target)
-    say(`installed splash rotation: ${target}`)
-  } catch (error) {
-    say(`could not install splash rotation: ${String(error?.message ?? error)}`)
-  }
-}
-
 function installInPlace(asarPath, quiet) {
   const say = (message) => {
     if (!quiet) console.log(message)
@@ -638,7 +582,6 @@ function installInPlace(asarPath, quiet) {
       say(`kept an unpatched backup: ${UNPATCHED_BACKUP}`)
     }
     fs.copyFileSync(tmp, asarPath)
-    installRotationFile(asarPath, say)
     say('installed patched app.asar (takes effect on the next DSH start)')
     return { code: 0, action: 'patched', detail: 'installed in place' }
   } finally {
