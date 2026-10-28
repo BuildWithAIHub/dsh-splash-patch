@@ -17,6 +17,16 @@ while DSH boots behind it - and keep it working after DSH auto-updates.
 *示意图：快捷方式 → 启动器（必要时先补丁）→ 开屏窗口播放视频，同时隐藏的主窗口加载
 DSH → 视频播完 / 按 Esc 后无缝进入工作区。*
 
+## The start-up clips (real previews)
+
+开屏实际播放的就是动画插件里的这两段视频（在插件片库里选哪段就播哪段）：
+
+| DeepSeek 赛博朋克片头 | DeepSeek 数字角色苏醒 |
+|---|---|
+| ![Cyberpunk intro](docs/images/demo-cyberpunk.gif) | ![Awakening intro](docs/images/demo-awakening.gif) |
+
+*以上 GIF 是 `dsh-boot-animation` 插件自带片段的**短节选预览**，仅用于说明效果；版权归各自权利人所有，不属于本项目代码，若权利人要求会立即移除。*
+
 ## Requirements
 
 - Windows 10/11
