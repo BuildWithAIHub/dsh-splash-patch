@@ -33,7 +33,7 @@ foreach ($root in $roots) {
       $shortcut.TargetPath = $wscript
       $shortcut.Arguments = '"' + $launcher + '"'
       $shortcut.WorkingDirectory = Split-Path -Parent $exe
-      $shortcut.IconLocation = '"' + $exe + '",0'
+      $shortcut.IconLocation = "$exe,0"
       $shortcut.Save()
       $changed += [pscustomobject]@{ shortcut = $link.FullName; backup = $backup; created = $false }
       Write-Host "retargeted: $($link.FullName)"
@@ -51,7 +51,7 @@ if ($changed.Count -eq 0) {
     $shortcut.TargetPath = $wscript
     $shortcut.Arguments = '"' + $launcher + '"'
     $shortcut.WorkingDirectory = Split-Path -Parent $exe
-    $shortcut.IconLocation = '"' + $exe + '",0'
+    $shortcut.IconLocation = "$exe,0"
     $shortcut.Description = 'DeepSeek Harness with boot splash'
     $shortcut.Save()
     $changed += [pscustomobject]@{ shortcut = $new; backup = ''; created = $true }
