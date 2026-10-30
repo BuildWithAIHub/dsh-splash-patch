@@ -13,3 +13,5 @@ node_modules/
 .vscode/
 .DS_Store
 Thumbs.db
+# boot intro clips are placed locally next to the patcher (not redistributed)
+boot-intro-*.mp4

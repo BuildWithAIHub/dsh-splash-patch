@@ -571,6 +571,39 @@ function patchArchive({ asarPath, outPath, quiet }) {
   }
 }
 
+/**
+ * Copy the boot intro clips that live next to this patcher into resources/,
+ * next to app.asar. A DSH update replaces the whole install directory, which
+ * deletes resources/boot-intro-*.mp4; the splash page then gets a 404 and
+ * immediately falls back to the workspace (looks like the splash "flashes and
+ * exits"). Re-installing the clips on every patch run keeps the splash alive.
+ */
+function installBootClips(asarPath, say) {
+  const directory = path.dirname(asarPath)
+  let names = []
+  try {
+    names = fs.readdirSync(HERE)
+  } catch {
+    return 0
+  }
+  let copied = 0
+  for (const name of names) {
+    if (!/^boot-intro-[a-z0-9-]+\.mp4$/i.test(name)) continue
+    const source = path.join(HERE, name)
+    const target = path.join(directory, name)
+    try {
+      const sourceSize = fs.statSync(source).size
+      if (fs.existsSync(target) && fs.statSync(target).size === sourceSize) continue
+      fs.copyFileSync(source, target)
+      copied += 1
+    } catch (error) {
+      say(`could not install ${name}: ${String(error?.message ?? error)}`)
+    }
+  }
+  if (copied > 0) say(`installed ${String(copied)} boot clip(s) next to app.asar`)
+  return copied
+}
+
 function installInPlace(asarPath, quiet) {
   const say = (message) => {
     if (!quiet) console.log(message)
@@ -582,6 +615,7 @@ function installInPlace(asarPath, quiet) {
       say(`kept an unpatched backup: ${UNPATCHED_BACKUP}`)
     }
     fs.copyFileSync(tmp, asarPath)
+    installBootClips(asarPath, say)
     say('installed patched app.asar (takes effect on the next DSH start)')
     return { code: 0, action: 'patched', detail: 'installed in place' }
   } finally {
@@ -753,6 +787,9 @@ try {
     } catch {
       /* nothing to remove */
     }
+    installBootClips(asarPath, (message) => {
+      if (!options.quiet) console.log(message)
+    })
     writeStatus(result)
     log('already patched')
     process.exit(0)

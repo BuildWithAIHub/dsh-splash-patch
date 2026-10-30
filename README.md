@@ -95,6 +95,15 @@ DSH continues to work normally (just without the splash).
 The splash page plays a local file from the DSH resources directory:
 `resources\boot-intro-*.mp4`. The name is chosen from
 `%DSH_HOME%\boot-animation\selection.json` when that file exists, otherwise
+If `boot-intro-*.mp4` files are placed next to the patcher (for example in
+`auto/`), every patch run copies any missing clip into `resources/` next to
+`app.asar`. This matters after a DSH update: the installer replaces the whole
+install directory and deletes the clips, which makes the splash page get a 404
+and close immediately (it looks like the splash "flashes and exits"). With the
+clips next to the patcher the launcher/watchdog restores them automatically.
+
+The command below only works when the clip sources exist on your machine.
+
 `boot-intro-awakening.mp4`. **No video or DSH asset is redistributed by this repo** -
 the files must already exist in your installation.
 
